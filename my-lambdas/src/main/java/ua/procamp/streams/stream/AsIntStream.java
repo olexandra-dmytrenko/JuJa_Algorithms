@@ -75,7 +75,7 @@ public class AsIntStream implements IntStream {
     public IntStream filter(IntPredicate predicate) {
         Supplier<List<Integer>> valuesSupplied = () -> {
             List<Integer> result = new ArrayList<>();
-            for (Integer val : iterator.current()) {
+            for (Integer val : iterator.next()) {
                 if (predicate.test(val)) {
                     result.add(val);
                 }
@@ -89,8 +89,8 @@ public class AsIntStream implements IntStream {
     @Override
     public IntStream map(IntUnaryOperator mapper) {
         Supplier<List<Integer>> valuesSupplied = () -> {
-            List<Integer> result = new ArrayList<>(iterator.current().size());
-            for (Integer val : iterator.current()) {
+            List<Integer> result = new ArrayList<>(iterator.next().size());
+            for (Integer val : iterator.next()) {
                 result.add(mapper.apply(val));
             }
             return result;
@@ -103,7 +103,7 @@ public class AsIntStream implements IntStream {
     public IntStream flatMap(IntToIntStreamFunction func) {
         Supplier<List<Integer>> valuesSupplied = () -> {
             List<Integer> result = new ArrayList<>();
-            for (Integer val : iterator.current()) {
+            for (Integer val : iterator.next()) {
                 final int[] newVals = func.applyAsIntStream(val).toArray();
                 result.addAll(convertType(newVals));
             }
@@ -165,10 +165,9 @@ public class AsIntStream implements IntStream {
         return new ArrayList<>(asList(toObject(values)));
     }
 
-    private class StreamIterator implements Iterator<Integer> {
+    private class StreamIterator implements Iterator<List<Integer>> {
         private final List<Integer> values;
         private List<Integer> currentValue;
-        //        private Integer currentValue;
         private final int size;
 
         private int currentIndex = 0;
@@ -185,12 +184,7 @@ public class AsIntStream implements IntStream {
         }
 
         @Override
-        public Integer next() {
-            currentIndex++;
-            return values.get(currentIndex);
-        }
-
-        private List<Integer> current() {
+        public List<Integer> next() {
             return currentValue;
         }
 
