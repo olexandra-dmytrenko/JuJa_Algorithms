@@ -154,7 +154,7 @@ public class AsIntStreamTest {
     public void shouldThrow_whenFilterAllValuesWithMin() {
         IntStream stream = AsIntStream.of(1, 2, 4, 0);
         IntStream filtered = stream.filter(value -> value < 0);
-        int max = filtered.min();
+        filtered.min();
     }
 
     @Test
@@ -182,8 +182,8 @@ public class AsIntStreamTest {
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrow_whenMapAndAverageWithNoVals() {
         IntStream stream = AsIntStream.of();
-        IntStream filtered = stream.map(value -> value * 2);
-        filtered.average();
+        IntStream result = stream.map(value -> value * 2);
+        result.average();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -239,6 +239,17 @@ public class AsIntStreamTest {
         assertEquals(0, result);
     }
 
+    @Test
+    public void shouldFlatmapTwiceAndFilter() {
+        IntStream stream = AsIntStream.of(-1, 1, 3, 2);
+        IntStream resultStream = stream
+                .flatMap(value -> AsIntStream.of(value, value * 2))
+                .flatMap(value -> AsIntStream.of(value, value * 4))
+                .filter(value -> value < 20);
+        long result = resultStream.count();
+        assertEquals(15, result);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrow_whenFlatMapToNull() {
         IntStream stream = AsIntStream.of(1, 2);
@@ -283,7 +294,7 @@ public class AsIntStreamTest {
         testVar = 0;
     }
 
-    private void meantToTestForEach(int a){
+    private void meantToTestForEach(int a) {
         testVar += a;
     }
 
